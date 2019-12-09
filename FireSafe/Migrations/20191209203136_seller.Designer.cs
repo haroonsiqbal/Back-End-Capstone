@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FireSafe.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191209165122_initial")]
-    partial class initial
+    [Migration("20191209203136_seller")]
+    partial class seller
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -170,15 +170,10 @@ namespace FireSafe.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Name")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.HasKey("SellerId");
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Sellers");
                 });
@@ -332,15 +327,6 @@ namespace FireSafe.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("FireSafe.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("FireSafe.Models.Seller", b =>
-                {
                     b.HasOne("FireSafe.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")

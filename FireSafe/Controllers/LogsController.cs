@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FireSafe.Data;
 using FireSafe.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace FireSafe.Controllers
 {
@@ -15,15 +16,18 @@ namespace FireSafe.Controllers
     public class LogsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public LogsController(ApplicationDbContext context)
+        public LogsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
         }
 
         // GET: Logs
         public async Task<IActionResult> Index()
         {
+            var user = await _userManager.GetUserAsync(HttpContext.User);
             var applicationDbContext = _context.Logs.Include(l => l.Category).Include(l => l.Seller).Include(l => l.User);
             return View(await applicationDbContext.ToListAsync());
         }
@@ -53,7 +57,7 @@ namespace FireSafe.Controllers
         public IActionResult Create()
         {
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type");
-            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "UserId");
+            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name");
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
             return View();
         }
@@ -63,17 +67,21 @@ namespace FireSafe.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Manufacturer,Model,CategoryId,Price,SellerId,Quantity,PurchaseDate,Comment,UserId")] Log log)
+        public async Task<IActionResult> Create([Bind("Id,Name,Manufacturer,Model,CategoryId,Price,SellerId,Quantity,PurchaseDate,Comment")] Log log)
         {
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
             if (ModelState.IsValid)
             {
+                var user = await _userManager.GetUserAsync(HttpContext.User);
+                log.UserId = user.Id;
                 _context.Add(log);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", log.CategoryId);
-            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "UserId", log.SellerId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", log.UserId);
+            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name", log.SellerId);
+    
             return View(log);
         }
 
@@ -91,7 +99,7 @@ namespace FireSafe.Controllers
                 return NotFound();
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", log.CategoryId);
-            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "UserId", log.SellerId);
+            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "SellerId", log.SellerId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", log.UserId);
             return View(log);
         }
@@ -129,7 +137,7 @@ namespace FireSafe.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", log.CategoryId);
-            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "UserId", log.SellerId);
+            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "SellerId", log.SellerId);
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", log.UserId);
             return View(log);
         }
