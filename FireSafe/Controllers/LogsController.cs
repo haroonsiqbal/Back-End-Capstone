@@ -28,8 +28,9 @@ namespace FireSafe.Controllers
         public async Task<IActionResult> Index()
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
-            var applicationDbContext = _context.Logs.Include(l => l.Category).Include(l => l.Seller).Include(l => l.User);
-            return View(await applicationDbContext.ToListAsync());
+            var userLogs = await _context.Logs.Where(l => l.UserId == user.Id)
+                                            .ToListAsync();
+            return View(userLogs);
         }
 
         // GET: Logs/Details/5
@@ -99,8 +100,8 @@ namespace FireSafe.Controllers
                 return NotFound();
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", log.CategoryId);
-            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "SellerId", log.SellerId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", log.UserId);
+            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name", log.SellerId);
+            
             return View(log);
         }
 
@@ -116,10 +117,14 @@ namespace FireSafe.Controllers
                 return NotFound();
             }
 
+            ModelState.Remove("UserId");
+            ModelState.Remove("User");
             if (ModelState.IsValid)
             {
                 try
                 {
+                    var user = await _userManager.GetUserAsync(HttpContext.User);
+                    log.UserId = user.Id;
                     _context.Update(log);
                     await _context.SaveChangesAsync();
                 }
@@ -137,8 +142,8 @@ namespace FireSafe.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", log.CategoryId);
-            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "SellerId", log.SellerId);
-            ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id", log.UserId);
+            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name", log.SellerId);
+            
             return View(log);
         }
 
