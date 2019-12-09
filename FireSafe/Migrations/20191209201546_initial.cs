@@ -62,6 +62,19 @@ namespace FireSafe.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Sellers",
+                columns: table => new
+                {
+                    SellerId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Sellers", x => x.SellerId);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -168,26 +181,6 @@ namespace FireSafe.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sellers",
-                columns: table => new
-                {
-                    SellerId = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(nullable: true),
-                    UserId = table.Column<string>(nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Sellers", x => x.SellerId);
-                    table.ForeignKey(
-                        name: "FK_Sellers_AspNetUsers_UserId",
-                        column: x => x.UserId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Logs",
                 columns: table => new
                 {
@@ -279,11 +272,6 @@ namespace FireSafe.Migrations
             migrationBuilder.CreateIndex(
                 name: "IX_Logs_UserId",
                 table: "Logs",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Sellers_UserId",
-                table: "Sellers",
                 column: "UserId");
         }
 
