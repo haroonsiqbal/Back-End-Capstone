@@ -29,6 +29,8 @@ namespace FireSafe.Controllers
         {
             var user = await _userManager.GetUserAsync(HttpContext.User);
             var userLogs = await _context.Logs.Where(l => l.UserId == user.Id)
+                                            .Include(l => l.Category)
+                                            .Include(l => l.Seller)
                                             .ToListAsync();
             return View(userLogs);
         }
