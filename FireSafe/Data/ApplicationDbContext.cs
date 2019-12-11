@@ -17,6 +17,9 @@ namespace FireSafe.Data
         public DbSet<Category> Categories { get; set; }
         public DbSet<Seller> Sellers { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Policy> Policies { get; set; }
+
+       
 
 
     }
