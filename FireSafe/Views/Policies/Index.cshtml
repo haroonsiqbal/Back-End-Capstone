@@ -30,9 +30,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.EndDate)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Riders)
-            </th>
+            
             
             <th></th>
         </tr>
@@ -50,7 +48,7 @@
                 @Html.DisplayFor(modelItem => item.Type)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.CoverageAmount)
+                $@Html.DisplayFor(modelItem => item.CoverageAmount)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.StartDate)
@@ -58,9 +56,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.EndDate)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Riders)
-            </td>
+          
            
             <td>
                 <a asp-action="Edit" asp-route-id="@item.PolicyId">Edit</a> |
