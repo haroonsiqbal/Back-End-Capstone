@@ -3,10 +3,12 @@ for details on configuring this project to bundle and minify static web assets. 
 
 h1.display-4 {
     font-family: 'Bebas Neue', cursive;
+    font-size: 4em;
 }
 
 p {
     font-family: 'Nanum Gothic', sans-serif;
+    font-size: 1.3em;
 }
 
 a.navbar-brand {
@@ -17,20 +19,21 @@ a.navbar-brand {
 
 .navbar {
     background-color: #ffcc4d !important;
-    font-family: 'Bebas Neue', cursive;
-    
+    font-family: 'Nanum Gothic', cursive;   
 }
 
-.navbar:hover {
-    color: white !important;
-}
+
 
 
 
 
 /* Provide sufficient contrast against white background */
 a {
-  color: #0366d6;
+    color: #ea8500;
+}
+
+a:hover {
+    color: #b36600;
 }
 
 .btn-primary {
@@ -57,10 +60,10 @@ html {
 }
 
 .border-top {
-  border-top: 1px solid #e5e5e5;
+  border-top: 1px solid #000000;
 }
 .border-bottom {
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 1px solid #000000;
 }
 
 .box-shadow {
@@ -80,8 +83,9 @@ html {
 }
 
 body {
-  /* Margin bottom by footer height */
-  margin-bottom: 60px;
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+    background-color: #fcfbe3;
 }
 .footer {
     position: absolute;
