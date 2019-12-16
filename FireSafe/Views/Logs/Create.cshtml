@@ -30,7 +30,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="CategoryId" class="control-label"></label>
-                <select asp-for="CategoryId" class ="form-control" asp-items="ViewBag.CategoryId"></select>
+                <select asp-for="CategoryId" class="form-control" asp-items="ViewBag.CategoryId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="Price" class="control-label"></label>
@@ -39,7 +39,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="SellerId" class="control-label"></label>
-                <select asp-for="SellerId" class ="form-control" asp-items="ViewBag.SellerId"></select>
+                <select asp-for="SellerId" class="form-control" asp-items="ViewBag.SellerId"></select>
             </div>
             <div class="form-group">
                 <label asp-for="Quantity" class="control-label"></label>
@@ -60,6 +60,12 @@
                 <input type="submit" value="Create" class="btn btn-warning" />
             </div>
         </form>
+        <form class="form-horizontal" asp-controller="Image" asp-action="UploadImage" method="POST" enctype="multipart/form-data">
+            <input type="file" asp-for="UploadImage.ImageFile">
+            <input type="text" asp-for="UploadImage.ImageName">
+            <input type="text" asp-for="UploadImage.ImageDescription">
+        </form>
+
     </div>
 </div>
 

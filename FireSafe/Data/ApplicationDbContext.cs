@@ -19,6 +19,11 @@ namespace FireSafe.Data
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Policy> Policies { get; set; }
 
+        public DbSet<UploadImage> UploadImages { get; set; }
+
+
+        
+
        
 
 

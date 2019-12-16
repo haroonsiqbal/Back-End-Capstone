@@ -42,5 +42,7 @@ namespace FireSafe.Models
 
         [Required]
         public ApplicationUser User { get; set; }
+
+        public UploadImage UploadImage { get; set; } = new UploadImage();
     }
 }
