@@ -9,6 +9,8 @@ using FireSafe.Data;
 using FireSafe.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
 
 namespace FireSafe.Controllers
 {
@@ -18,10 +20,13 @@ namespace FireSafe.Controllers
         private readonly ApplicationDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public LogsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly IHostingEnvironment hostingEnvironment;
+
+        public LogsController(ApplicationDbContext context, UserManager<ApplicationUser> userManager, IHostingEnvironment environment)
         {
             _context = context;
             _userManager = userManager;
+            hostingEnvironment = environment;
         }
 
         // GET: Logs
@@ -62,7 +67,7 @@ namespace FireSafe.Controllers
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type");
             ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name");
             ViewData["UserId"] = new SelectList(_context.ApplicationUsers, "Id", "Id");
-            return View();
+            return View(new CreateLogViewModel());
         }
 
         // POST: Logs/Create
@@ -70,22 +75,46 @@ namespace FireSafe.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,Manufacturer,Model,CategoryId,Price,SellerId,Quantity,PurchaseDate,Comment")] Log log)
+        public async Task<IActionResult> Create(CreateLogViewModel model)
         {
-            ModelState.Remove("UserId");
-            ModelState.Remove("User");
+
+            ModelState.Remove("Log.UserId");
+            ModelState.Remove("Log.User");
             if (ModelState.IsValid)
             {
+                if (model.MyImage != null)
+                {
+                    var uniqueFileName = GetUniqueFileName(model.MyImage.FileName);
+                    var uploads = Path.Combine(hostingEnvironment.WebRootPath, "images");
+                    var filePath = Path.Combine(uploads, uniqueFileName);
+                    using (var myFile = new FileStream(filePath, FileMode.Create))
+                    {
+                        model.MyImage.CopyTo(myFile);
+                    }
+                    model.Log.FileName = uniqueFileName;
+
+                    //to do : Save uniqueFileName  to your db table   
+                }
                 var user = await _userManager.GetUserAsync(HttpContext.User);
-                log.UserId = user.Id;
-                _context.Add(log);
+                model.Log.UserId = user.Id;
+                
+                _context.Add(model.Log);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", log.CategoryId);
-            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name", log.SellerId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", model.Log.CategoryId);
+            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name", model.Log.SellerId);
     
-            return View(log);
+            return View(model);
+        }
+
+        private string GetUniqueFileName(string fileName)
+        {
+            fileName = Path.GetFileName(fileName);
+            return Path.GetFileNameWithoutExtension(fileName)
+                      + "_"
+                      + Guid.NewGuid().ToString().Substring(0, 4)
+                      + Path.GetExtension(fileName);
         }
 
         // GET: Logs/Edit/5
