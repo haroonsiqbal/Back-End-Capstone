@@ -130,10 +130,15 @@ namespace FireSafe.Controllers
             {
                 return NotFound();
             }
+
+            var viewModel = new CreateLogViewModel()
+            {
+                Log = log
+            };
             ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", log.CategoryId);
             ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name", log.SellerId);
             
-            return View(log);
+            return View(viewModel);
         }
 
         // POST: Logs/Edit/5
@@ -141,27 +146,45 @@ namespace FireSafe.Controllers
         // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Manufacturer,Model,CategoryId,Price,SellerId,Quantity,PurchaseDate,Comment,UserId")] Log log)
+        public async Task<IActionResult> Edit(int id, CreateLogViewModel model)
         {
-            if (id != log.Id)
+            if (id != model.Log.Id)
             {
                 return NotFound();
             }
 
-            ModelState.Remove("UserId");
-            ModelState.Remove("User");
+            ModelState.Remove("Log.UserId");
+            ModelState.Remove("Log.User");
             if (ModelState.IsValid)
             {
+                var currentFileName = model.Log.FileName;
+                if (model.MyImage != null && model.MyImage.FileName != currentFileName)
+                {
+                    if (currentFileName != null)
+                    {
+                        var images = Directory.GetFiles("wwwroot/images");
+                        var fileToDelete = images.First(i => i.Contains(currentFileName));
+                        System.IO.File.Delete(fileToDelete);
+                    }
+                    var uniqueFileName = GetUniqueFileName(model.MyImage.FileName);
+                    var imageDirectory = Path.Combine(hostingEnvironment.WebRootPath, "images");
+                    var filePath = Path.Combine(imageDirectory, uniqueFileName);
+                    using (var myFile = new FileStream(filePath, FileMode.Create))
+                    {
+                        model.MyImage.CopyTo(myFile);
+                    }
+                    model.Log.FileName = uniqueFileName;
+                }
                 try
                 {
                     var user = await _userManager.GetUserAsync(HttpContext.User);
-                    log.UserId = user.Id;
-                    _context.Update(log);
+                    model.Log.UserId = user.Id;
+                    _context.Update(model.Log);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!LogExists(log.Id))
+                    if (!LogExists(model.Log.Id))
                     {
                         return NotFound();
                     }
@@ -172,10 +195,10 @@ namespace FireSafe.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", log.CategoryId);
-            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name", log.SellerId);
+            ViewData["CategoryId"] = new SelectList(_context.Categories, "CategoryId", "Type", model.Log.CategoryId);
+            ViewData["SellerId"] = new SelectList(_context.Sellers, "SellerId", "Name", model.Log.SellerId);
             
-            return View(log);
+            return View(model);
         }
 
         // GET: Logs/Delete/5
