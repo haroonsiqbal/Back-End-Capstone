@@ -42,5 +42,9 @@ namespace FireSafe.Models
 
         [Required]
         public ApplicationUser User { get; set; }
+        
+        [Display(Name = "Image")]
+        public string FileName { get; set; }
+
     }
 }

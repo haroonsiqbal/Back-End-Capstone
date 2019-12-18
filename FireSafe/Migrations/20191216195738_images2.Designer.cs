@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FireSafe.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20191211164722_policy6")]
-    partial class policy6
+    [Migration("20191216195738_images2")]
+    partial class images2
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -147,6 +147,9 @@ namespace FireSafe.Migrations
                     b.Property<int>("SellerId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("UploadImageImageId")
+                        .HasColumnType("int");
+
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -156,6 +159,8 @@ namespace FireSafe.Migrations
                     b.HasIndex("CategoryId");
 
                     b.HasIndex("SellerId");
+
+                    b.HasIndex("UploadImageImageId");
 
                     b.HasIndex("UserId");
 
@@ -217,6 +222,33 @@ namespace FireSafe.Migrations
                     b.HasKey("SellerId");
 
                     b.ToTable("Sellers");
+                });
+
+            modelBuilder.Entity("FireSafe.Models.UploadImage", b =>
+                {
+                    b.Property<int>("ImageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("ImageDescription")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageFile")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImageName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("ImageId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UploadImages");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -368,6 +400,10 @@ namespace FireSafe.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("FireSafe.Models.UploadImage", "UploadImage")
+                        .WithMany()
+                        .HasForeignKey("UploadImageImageId");
+
                     b.HasOne("FireSafe.Models.ApplicationUser", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -376,6 +412,15 @@ namespace FireSafe.Migrations
                 });
 
             modelBuilder.Entity("FireSafe.Models.Policy", b =>
+                {
+                    b.HasOne("FireSafe.Models.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("FireSafe.Models.UploadImage", b =>
                 {
                     b.HasOne("FireSafe.Models.ApplicationUser", "User")
                         .WithMany()
