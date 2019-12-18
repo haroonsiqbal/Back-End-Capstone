@@ -228,6 +228,15 @@ namespace FireSafe.Controllers
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             var log = await _context.Logs.FindAsync(id);
+            var currentFileName = log.FileName;
+            
+                if (currentFileName != null)
+                {
+                    var images = Directory.GetFiles("wwwroot/images");
+                    var fileToDelete = images.First(i => i.Contains(currentFileName));
+                    System.IO.File.Delete(fileToDelete);
+                }
+            
             _context.Logs.Remove(log);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
